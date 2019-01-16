@@ -1,8 +1,18 @@
 extends layout
 
 block content
-  h1 Welcome to Sawtooth
-  form(method='POST')
-    Label Enter a message
-    input(type='text' name='txtinput' autofocus)
-    button(type='submit') Submit
+  h1 Kerala Blockchain Academy
+  h2 Certified Hyperledger Developer (CHD)
+  h1
+      center A Sample Hello World Program in Sawtooth
+      br
+      br
+  form(method='POST'  name="write")
+    center
+      h2 Welcome to Hyperledger Sawtooth
+      Label Enter a message
+      input(type='text' name='txtinput' autofocus)
+      button(type='submit') Write Message
+  form(method='GET' name="read" action="/readmsg")
+    center
+      button(type='submit') Read Message

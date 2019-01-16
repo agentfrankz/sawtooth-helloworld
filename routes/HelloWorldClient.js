@@ -11,6 +11,7 @@ var express = require('express');
 var router = express.Router();
 
 FAMILY_NAME="helloworldtf";
+NAMESPACE="";
 
   
 privateKeyHex = "66ad89d0ff29b0267fba72ea8d40ef7975e10f8acde8d50d20cdf56ba9599c5e";
@@ -21,14 +22,14 @@ function hash(v) {
 
 class HelloWorldClient{
 
-  constructor(msg){
+  constructor(){
     
     //---------------private key from string
     const context = createContext('secp256k1');
     const secp256k1pk = Secp256k1PrivateKey.fromHex(privateKeyHex.trim());
     this.signer = new CryptoFactory(context).newSigner(secp256k1pk);
     this.publicKey = this.signer.getPublicKey().asHex();
-    console.log(this.publicKey);
+    //console.log(this.publicKey);
 
     //console.log(msg)
     
@@ -56,20 +57,24 @@ class HelloWorldClient{
     //console.log(privateKey);
     
     //console.log(this.publicKey);
-    this.address = hash(FAMILY_NAME).substr(0, 6) + hash(this.publicKey).substr(0, 64);
-    this.payload = msg;
+    NAMESPACE = hash(FAMILY_NAME).substr(0, 6);
+    this.address = NAMESPACE + hash(this.publicKey).substr(0, 64);
+    console.log(this.address);
     //console.log(this.payload);
-    this.payloadBytes = new TextEncoder('utf8').encode(this.payload);
+    
   }
-    createTransaction(){
+    createTransaction(msg){
+      this.payload = msg;
+      this.payloadBytes = new TextEncoder('utf8').encode(this.payload);
+//console.log(this.payloadBytes);
         const transactionHeaderBytes = protobuf.TransactionHeader.encode({
             batcherPublicKey: this.signer.getPublicKey().asHex(),
             dependencies: [],
             familyName: FAMILY_NAME,
             familyVersion: '1.0',
-            inputs: [this.address],
+            inputs: [NAMESPACE],
             nonce: Math.random().toString(),
-            outputs: [this.address],
+            outputs: [NAMESPACE],
             payloadSha512: hash(this.payloadBytes),
             signerPublicKey: this.signer.getPublicKey().asHex()
         }).finish();
@@ -92,8 +97,8 @@ class HelloWorldClient{
         const batchListBytes = protobuf.BatchList.encode({
             batches: [batch]
         }).finish();
-
-        this._send_to_rest_api(batchListBytes);	  
+return batchListBytes;
+        //this._send_to_rest_api(batchListBytes);
     
     }
     _send_to_rest_api(batchListBytes){

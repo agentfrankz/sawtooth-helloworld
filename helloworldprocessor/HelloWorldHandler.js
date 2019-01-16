@@ -18,7 +18,7 @@ function writeToStore(context, address, msg){
         [address]: msgBytes 
       }
     context.setState(entries);
-    console.log("Successsssssssssssss");
+    //console.log("Successsssssssssssss");
 }
 
 class HelloWorldHandler extends TransactionHandler{
@@ -30,7 +30,7 @@ class HelloWorldHandler extends TransactionHandler{
         var msg = decoder.decode(transactionProcessRequest.payload);
         let header = transactionProcessRequest.header
         this.publicKey = header.signerPublicKey
-        console.log('msg =========================================================================' + msg);
+        //console.log('msg =========================================================================' + msg);
         this.address = hash(FAMILY_NAME).substr(0, 6) + hash(this.publicKey).substr(0, 64);
         writeToStore(context, this.address, msg);
     }
