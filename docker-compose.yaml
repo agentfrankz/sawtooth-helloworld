@@ -1,12 +1,32 @@
 version: '2.0'
 
-
 services:
-  helloworldprocessor:
-    container_name: helloworldprocessor
+  helloworld-client:
+    container_name: helloworld-client
     build:
       context: .
-      dockerfile: helloworldprocessor/DockerFile
+      dockerfile: ./helloworld_client/DockerFile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    environment:
+      - 'http_proxy=${http_proxy}'
+      - 'https_proxy=${https_proxy}'
+      - 'no_proxy=rest-api,validator,${no_proxy}'
+    volumes:
+        - '.:/project/sawtooth-helloworld'
+    ports:
+      - '0.0.0.0:3000:3000'
+    depends_on:
+        - sawtooth-rest-api
+    stop_signal: SIGKILL
+
+  helloworld_processor:
+    container_name: helloworld_processor
+    build:
+      context: .
+      dockerfile: ./helloworld_processor/DockerFile
       args:
         - http_proxy
         - https_proxy
@@ -15,6 +35,7 @@ services:
         - validator
     volumes:
         - '.:/project/sawtooth-helloworld'
+
   sawtooth-rest-api:
     container_name: rest-api
     image: hyperledger/sawtooth-rest-api:1.0
@@ -28,13 +49,15 @@ services:
       sawtooth-rest-api -vvv
         --connect tcp://validator:4004
         --bind sawtooth-rest-api:8008
+
   settings-tp:
     image: hyperledger/sawtooth-settings-tp:1.0
     depends_on:
       - validator
     command: settings-tp -vv --connect tcp://validator:4004
+
   validator:
-    container_name: validator6
+    container_name: validator
     image: hyperledger/sawtooth-validator:1.0
     expose:
       - 4004
